@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>動画ギャラリー</title>
+<style>
+  body { background-color: #121212; color: #fff; font-family: sans-serif; margin: 0; padding: 20px; }
+  #search { margin-bottom: 20px; padding: 10px; width: 100%; font-size: 16px; }
+  #sort { margin-bottom: 20px; padding: 10px; font-size: 16px; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .card { background: #1e1e1e; border-radius: 8px; overflow: hidden; transition: transform 0.2s; }
+  .card:hover { transform: scale(1.03); }
+  .video-container { position: relative; padding-top: 56.25%; } /* 16:9 */
+  .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  .info { padding: 10px; }
+  .title { font-weight: bold; margin-bottom: 5px; }
+  .description { font-size: 14px; margin-bottom: 5px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag { background: #333; border-radius: 4px; padding: 2px 6px; font-size: 12px; cursor: pointer; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<input type="text" id="search" placeholder="検索...">
+<select id="sort">
+  <option value="newest">新着順</option>
+  <option value="oldest">古い順</option>
+  <option value="title">タイトル順</option>
+</select>
+
+<div class="gallery" id="gallery"></div>
+
+<script>
+// ここに動画データを追加
+const videos = [
+  {
+    title: "参考動画1",
+    description: "ジャンプの動き",
+    tags: ["Jump","Motion","Study"],
+    url: "https://www.youtube.com/embed/VIDEO_ID1"
+  },
+  {
+    title: "参考動画2",
+    description: "走る動き",
+    tags: ["Run","Action"],
+    url: "https://www.youtube.com/embed/VIDEO_ID2"
+  },
+  {
+    title: "参考動画3",
+    description: "Twitter動画例",
+    tags: ["Gesture","Pose"],
+    url: "https://twitframe.com/show?url=https://twitter.com/USERNAME/status/TWEET_ID"
+  }
+];
+
+// ギャラリー作成
+function renderGallery(filter="") {
+  const gallery = document.getElementById("gallery");
+  gallery.innerHTML = "";
+  const f = filter.toLowerCase();
+  videos.forEach(v => {
+    const tagMatch = v.tags.some(t => t.toLowerCase().includes(f));
+    const titleMatch = v.title.toLowerCase().includes(f);
+    const descMatch = v.description.toLowerCase().includes(f);
+    if (f === "" || tagMatch || titleMatch || descMatch) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="video-container">
+          <iframe src="${v.url}" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <div class="info">
+          <div class="title">${v.title}</div>
+          <div class="description">${v.description}</div>
+          <div class="tags">${v.tags.map(tag => `<span class="tag" onclick="filterTag('${tag}')">${tag}</span>`).join('')}</div>
+        </div>
+      `;
+      gallery.appendChild(card);
+    }
+  });
+}
+
+function filterTag(tag) {
+  document.getElementById("search").value = tag;
+  renderGallery(tag);
+}
+
+document.getElementById("search").addEventListener("input", e => renderGallery(e.target.value));
+
+renderGallery();
+</script>
+
+</body>
+</html>
