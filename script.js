@@ -151,11 +151,11 @@ document.getElementById("saveModal").onclick = () => {
 
     renderGallery();
     buildTagPanel();
-    hideModal();
+   hideModal();
+}
 
-};
+// 削除ボタン
 
-// ===== Delete Function =====
 function deleteVideo(index) {
     const ok = confirm("この動画を削除しますか？");
     if (!ok) return;
