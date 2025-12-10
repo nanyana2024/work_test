@@ -153,6 +153,8 @@ document.getElementById("saveModal").onclick = () => {
     buildTagPanel();
     hideModal();
 
+};
+
 // ===== Delete Function =====
 function deleteVideo(index) {
     const ok = confirm("この動画を削除しますか？");
@@ -162,5 +164,3 @@ function deleteVideo(index) {
     renderGallery();
     buildTagPanel();
 }
-
-};
