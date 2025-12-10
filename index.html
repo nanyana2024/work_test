@@ -33,7 +33,7 @@
 <!-- 追加/編集用モーダル -->
 <div id="modal" class="hidden">
     <div class="modal-content">
-        <h2 id="modalTitle">動画を追加</h2>
+        <h2 id="modalHeader">動画を追加</h2>
 
         <label>動画URL</label>
         <input type="text" id="modalUrl">
@@ -47,11 +47,15 @@
         <label>タグ（カンマ区切り）</label>
         <input type="text" id="modalTags">
 
-        <button id="saveModal">保存（※まだデータ保存はされません）</button>
-        <button id="cancelModal">キャンセル</button>
+        <div class="modal-buttons">
+            <button id="saveModal">保存</button>
+            <button id="closeModal">閉じる</button>
+        </div>
     </div>
 </div>
+
 
 <script src="script.js"></script>
 </body>
 </html>
+
