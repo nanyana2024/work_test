@@ -62,42 +62,65 @@ function filterByTag(tag) {
     renderGallery();
 }
 
-// モーダル
-document.getElementById("openAddModal").onclick = () => openAddModal();
-document.getElementById("cancelModal").onclick = () => closeModal();
+// ===== Modal Control =====
 
+const modal = document.getElementById("modal");
+const openAddBtn = document.getElementById("openAddModal");
+const closeBtn = document.getElementById("closeModal");
+const closeXBtn = document.getElementById("modalCloseX");
+
+function showModal() {
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden", "false");
+}
+
+function hideModal() {
+    modal.classList.add("hidden");
+    modal.setAttribute("aria-hidden", "true");
+}
+
+// 追加モード
 function openAddModal() {
     editIndex = null;
-    document.getElementById("modalTitle").textContent = "動画を追加";
+    document.getElementById("modalHeader").textContent = "動画を追加";
     document.getElementById("modalUrl").value = "";
     document.getElementById("modalTitleInput").value = "";
     document.getElementById("modalDesc").value = "";
     document.getElementById("modalTags").value = "";
-    document.getElementById("modal").classList.remove("hidden");
+    showModal();
 }
 
+// 編集モード
 function openEditModal(i) {
-    const v = videos[i];
     editIndex = i;
+    const v = videos[i];
 
-    document.getElementById("modalTitle").textContent = "動画を編集";
+    document.getElementById("modalHeader").textContent = "動画を編集";
     document.getElementById("modalUrl").value = v.url;
     document.getElementById("modalTitleInput").value = v.title;
     document.getElementById("modalDesc").value = v.description;
     document.getElementById("modalTags").value = v.tags.join(",");
-    document.getElementById("modal").classList.remove("hidden");
+
+    showModal();
 }
 
-function closeModal() {
-    document.getElementById("modal").classList.add("hidden");
-}
+// イベント登録
+openAddBtn.onclick = openAddModal;
+closeBtn.onclick = hideModal;
+if (closeXBtn) closeXBtn.onclick = hideModal;
 
-// 保存（まだデータ保存は行わない。UIのみ更新）
+// 背景クリックで閉じる
+modal.querySelector(".modal-overlay").onclick = hideModal;
+
+// 保存（UI更新のみ）
 document.getElementById("saveModal").onclick = () => {
     const url = document.getElementById("modalUrl").value;
     const title = document.getElementById("modalTitleInput").value;
     const desc = document.getElementById("modalDesc").value;
-    const tags = document.getElementById("modalTags").value.split(",").map(t => t.trim());
+    const tags = document.getElementById("modalTags").value
+        .split(",")
+        .map(t => t.trim())
+        .filter(t => t.length > 0);
 
     const newData = {
         url,
@@ -115,53 +138,5 @@ document.getElementById("saveModal").onclick = () => {
 
     renderGallery();
     buildTagPanel();
-    closeModal();
+    hideModal();
 };
-
-// タグパネル開閉
-document.getElementById("tagPanelBtn").onclick = () => {
-    document.getElementById("tagPanel").classList.add("visible");
-};
-document.getElementById("closeTagPanel").onclick = () => {
-    document.getElementById("tagPanel").classList.remove("visible");
-};
-
-// 検索/ソート反映
-document.getElementById("searchInput").oninput = renderGallery;
-document.getElementById("sortSelect").onchange = renderGallery;
-
-// モーダル開閉
-function showModal() {
-    document.getElementById("modal").classList.remove("hidden");
-}
-
-function hideModal() {
-    document.getElementById("modal").classList.add("hidden");
-}
-
-document.getElementById("closeModal").onclick = hideModal;
-
-// 追加モード
-document.getElementById("openAddModal").onclick = () => {
-    editIndex = null;
-    document.getElementById("modalHeader").textContent = "動画を追加";
-    document.getElementById("modalUrl").value = "";
-    document.getElementById("modalTitleInput").value = "";
-    document.getElementById("modalDesc").value = "";
-    document.getElementById("modalTags").value = "";
-    showModal();
-};
-
-// 編集モード
-function openEditModal(i) {
-    editIndex = i;
-    const v = videos[i];
-
-    document.getElementById("modalHeader").textContent = "動画を編集";
-    document.getElementById("modalUrl").value = v.url;
-    document.getElementById("modalTitleInput").value = v.title;
-    document.getElementById("modalDesc").value = v.description;
-    document.getElementById("modalTags").value = v.tags.join(",");
-
-    showModal();
-}
