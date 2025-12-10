@@ -75,61 +75,51 @@ button.editBtn {
     transform: translateX(0);
 }
 
-.hidden {
-    display: none;
-}
-
-#modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-content {
-    background: #1c1c1c;
-    padding: 20px;
-    width: 350px;
-    border-radius: 10px;
-}
-
-/* モーダル全体（背景） */
-#modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-}
+/* ==== Modal Base ==== */
 
 .hidden {
     display: none !important;
 }
 
+#modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+}
+
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+}
+
 /* モーダル内容 */
 .modal-content {
+    position: relative;
+    z-index: 1;
     background: #1c1c1c;
     padding: 20px;
-    width: 350px;
+    width: 380px;
+    max-width: calc(100% - 40px);
     border-radius: 10px;
-    box-shadow: 0 0 10px #000;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .modal-content label {
-    margin-top: 10px;
+    margin-top: 5px;
     display: block;
 }
 
 .modal-buttons {
     display: flex;
     justify-content: space-between;
+    gap: 10px;
     margin-top: 15px;
 }
 
 .modal-buttons button {
-    width: 48%;
+    flex: 1;
 }
