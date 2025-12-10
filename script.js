@@ -1,6 +1,18 @@
 let videos = [];
 let editIndex = null;
 
+// YouTube URL を iframe 用に変換
+function convertToEmbedUrl(url) {
+    if (url.includes("youtube.com/watch")) {
+        return url.replace("watch?v=", "embed/");
+    }
+    if (url.includes("youtu.be/")) {
+        return url.replace("youtu.be/", "youtube.com/embed/");
+    }
+    return url;
+}
+
+
 // 初期データ読み込み
 fetch("data.json")
     .then(res => res.json())
@@ -32,7 +44,7 @@ function renderGallery() {
 
     gallery.innerHTML = result.map((v, i) => `
         <div class="card">
-            <iframe src="${v.url}" allowfullscreen></iframe>
+            <iframe src="${convertToEmbedUrl(v.url)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
             <h3>${v.title}</h3>
             <p>${v.description}</p>
