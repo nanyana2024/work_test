@@ -94,3 +94,42 @@ button.editBtn {
     width: 350px;
     border-radius: 10px;
 }
+
+/* モーダル全体（背景） */
+#modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* モーダル内容 */
+.modal-content {
+    background: #1c1c1c;
+    padding: 20px;
+    width: 350px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #000;
+}
+
+.modal-content label {
+    margin-top: 10px;
+    display: block;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.modal-buttons button {
+    width: 48%;
+}
