@@ -31,8 +31,12 @@
 <div id="gallery"></div>
 
 <!-- 追加/編集用モーダル -->
-<div id="modal" class="hidden">
-    <div class="modal-content">
+<div id="modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-overlay"></div>
+
+    <div class="modal-content" role="dialog" aria-modal="true">
+        <button id="modalCloseX" class="modal-close-x">×</button>
+
         <h2 id="modalHeader">動画を追加</h2>
 
         <label>動画URL</label>
@@ -55,7 +59,9 @@
 </div>
 
 
+
 <script src="script.js"></script>
 </body>
 </html>
+
 
