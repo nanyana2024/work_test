@@ -53,6 +53,7 @@ function renderGallery() {
             </div>
 
             <button class="editBtn" onclick="openEditModal(${i})">編集</button>
+            <button class="deleteBtn" onclick="deleteVideo(${i})">削除</button>
         </div>
     `).join("");
 }
@@ -151,4 +152,15 @@ document.getElementById("saveModal").onclick = () => {
     renderGallery();
     buildTagPanel();
     hideModal();
+
+// ===== Delete Function =====
+function deleteVideo(index) {
+    const ok = confirm("この動画を削除しますか？");
+    if (!ok) return;
+
+    videos.splice(index, 1);
+    renderGallery();
+    buildTagPanel();
+}
+
 };
