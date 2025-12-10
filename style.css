@@ -123,3 +123,8 @@ button.editBtn {
 .modal-buttons button {
     flex: 1;
 }
+
+button.deleteBtn {
+    margin-top: 5px;
+    background: #662222;
+}
