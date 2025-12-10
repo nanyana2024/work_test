@@ -129,3 +129,39 @@ document.getElementById("closeTagPanel").onclick = () => {
 // 検索/ソート反映
 document.getElementById("searchInput").oninput = renderGallery;
 document.getElementById("sortSelect").onchange = renderGallery;
+
+// モーダル開閉
+function showModal() {
+    document.getElementById("modal").classList.remove("hidden");
+}
+
+function hideModal() {
+    document.getElementById("modal").classList.add("hidden");
+}
+
+document.getElementById("closeModal").onclick = hideModal;
+
+// 追加モード
+document.getElementById("openAddModal").onclick = () => {
+    editIndex = null;
+    document.getElementById("modalHeader").textContent = "動画を追加";
+    document.getElementById("modalUrl").value = "";
+    document.getElementById("modalTitleInput").value = "";
+    document.getElementById("modalDesc").value = "";
+    document.getElementById("modalTags").value = "";
+    showModal();
+};
+
+// 編集モード
+function openEditModal(i) {
+    editIndex = i;
+    const v = videos[i];
+
+    document.getElementById("modalHeader").textContent = "動画を編集";
+    document.getElementById("modalUrl").value = v.url;
+    document.getElementById("modalTitleInput").value = v.title;
+    document.getElementById("modalDesc").value = v.description;
+    document.getElementById("modalTags").value = v.tags.join(",");
+
+    showModal();
+}
