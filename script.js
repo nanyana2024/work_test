@@ -23,6 +23,13 @@ function convertToEmbedUrl(url) {
     return url;
 }
 
+function detectService(url) {
+    if (url.includes("youtube.com") || url.includes("youtu.be")) return "youtube";
+    if (url.includes("tiktok.com")) return "tiktok";
+    if (url.includes("twitter.com") || url.includes("x.com")) return "x";
+    return "other";
+}
+
 
 // ---------------------------
 // Supabase から読み込み
