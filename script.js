@@ -84,11 +84,7 @@ function renderGallery() {
         </div>
     `).join("");
 
-    // 埋め込みスクリプトの再読み込み
-    reloadTikTokScripts();
-    reloadTwitterScripts();
-
-    // renderGallery() の最後で
+    // X（Twitter）埋め込みを初期化
     if (window.twttr && twttr.widgets) {
         twttr.widgets.load();
     }
@@ -105,12 +101,6 @@ function buildEmbedHTML(url) {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen>
                 </iframe>`;
-    }
-
-    if (service === "tiktok") {
-        return `<blockquote class="tiktok-embed" cite="${url}" style="max-width: 305px;min-width: 325px;">
-                    <section>Loading...</section>
-                </blockquote>`;
     }
 
     // X（Twitter）埋め込み
