@@ -84,19 +84,14 @@ function renderGallery() {
         </div>
     `).join("");
 
-    // X（Twitter）埋め込みを初期化
-    // twttr が準備できていればロード、まだなら準備完了後にロード
+    // X（Twitter）埋め込み初期化
     if (window.twttr && twttr.widgets) {
         twttr.widgets.load();
-    } else {
-        window.twttr = window.twttr || {};
-        window.twttr.ready = window.twttr.ready || function(f){ document.addEventListener("DOMContentLoaded", f); };
-        window.twttr.ready(() => {
-            if (twttr.widgets) twttr.widgets.load();
-        });
     }
-}
 
+    // TikTok script 再読み込み
+    reloadTikTokScripts();
+}
 
 // ---------------------------
 // 埋め込み HTML 生成
@@ -111,35 +106,29 @@ function buildEmbedHTML(url) {
                 </iframe>`;
     }
 
-    // X（Twitter）埋め込み
+    if (service === "tiktok") {
+        return `<blockquote class="tiktok-embed" cite="${url}" style="max-width: 305px;min-width: 325px;">
+                    <section>Loading...</section>
+                </blockquote>`;
+    }
+
     if (service === "x") {
-        return `
-            <blockquote class="twitter-tweet">
-                <a href="${url}"></a>
-            </blockquote>
-        `;
+        return `<blockquote class="twitter-tweet">
+                    <a href="${url}"></a>
+                </blockquote>`;
     }
 
     return `<p>このURLは埋め込みに対応していません</p>`;
 }
 
 // ---------------------------
-// TikTok/X script 再読み込み
+// TikTok script 再読み込み
 // ---------------------------
 function reloadTikTokScripts() {
     const old = document.querySelectorAll('script[src="https://www.tiktok.com/embed.js"]');
     old.forEach(s => s.remove());
     const script = document.createElement("script");
     script.src = "https://www.tiktok.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-}
-
-function reloadTwitterScripts() {
-    const old = document.querySelectorAll('script[src="https://platform.twitter.com/widgets.js"]');
-    old.forEach(s => s.remove());
-    const script = document.createElement("script");
-    script.src = "https://platform.twitter.com/widgets.js";
     script.async = true;
     document.body.appendChild(script);
 }
