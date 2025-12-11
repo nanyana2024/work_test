@@ -18,15 +18,26 @@ function convertToEmbedUrl(url) {
     return url;
 }
 
+// Supabase から読み込み
+async function loadVideos() {
+    const { data, error } = await supabase
+        .from("videos")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-// 初期データ読み込み
-fetch("data.json")
-    .then(res => res.json())
-    .then(data => {
-        videos = data;
-        renderGallery();
-        buildTagPanel();
-    });
+    if (error) {
+        console.error("Load error:", error);
+        return;
+    }
+
+    videos = data;
+    renderGallery();
+    buildTagPanel();
+}
+
+// ページ読み込み時に走らせる
+loadVideos();
+
 
 function renderGallery() {
     const gallery = document.getElementById("gallery");
