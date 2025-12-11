@@ -54,8 +54,8 @@ function renderGallery() {
     );
 
     // ソート
-    if (sortType === "newest") result.sort((a, b) => b.dateAdded - a.dateAdded);
-    if (sortType === "oldest") result.sort((a, b) => a.dateAdded - b.dateAdded);
+    if (sortType === "newest") result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    if (sortType === "oldest") result.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     if (sortType === "title") result.sort((a, b) => a.title.localeCompare(b.title));
     if (sortType === "tag") result.sort((a, b) => (a.tags[0] || "").localeCompare(b.tags[0] || ""));
 
@@ -142,8 +142,8 @@ if (closeXBtn) closeXBtn.onclick = hideModal;
 // 背景クリックで閉じる
 modal.querySelector(".modal-overlay").onclick = hideModal;
 
-// 保存（UI更新のみ）
-document.getElementById("saveModal").onclick = () => {
+// 保存（Supabase へ INSERT / UPDATE）
+document.getElementById("saveModal").onclick = async () => {
     const url = document.getElementById("modalUrl").value;
     const title = document.getElementById("modalTitleInput").value;
     const desc = document.getElementById("modalDesc").value;
@@ -156,28 +156,49 @@ document.getElementById("saveModal").onclick = () => {
         url,
         title,
         description: desc,
-        tags,
-        dateAdded: Date.now()
+        tags
     };
 
     if (editIndex === null) {
-        videos.push(newData);
+        // 新規追加
+        const { error } = await supabase.from("videos").insert([newData]);
+        if (error) {
+            console.error("Insert error:", error);
+            return;
+        }
     } else {
-        videos[editIndex] = newData;
+        // 編集
+        const { error } = await supabase
+            .from("videos")
+            .update(newData)
+            .eq("id", videos[editIndex].id);
+
+        if (error) {
+            console.error("Update error:", error);
+            return;
+        }
     }
 
-    renderGallery();
-    buildTagPanel();
-   hideModal();
-}
+    hideModal();
+    loadVideos(); // DB 最新状態を反映
+};
 
 // 削除ボタン
 
-function deleteVideo(index) {
+async function deleteVideo(index) {
     const ok = confirm("この動画を削除しますか？");
     if (!ok) return;
 
-    videos.splice(index, 1);
-    renderGallery();
-    buildTagPanel();
+    const { error } = await supabase
+        .from("videos")
+        .delete()
+        .eq("id", videos[index].id);
+
+    if (error) {
+        console.error("Delete error:", error);
+        return;
+    }
+
+    loadVideos(); // 更新後の一覧を再取得
 }
+
