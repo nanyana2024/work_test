@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Reference Gallery</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- Supabase ライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -21,7 +23,7 @@
     <button id="openAddModal">＋ 動画を追加</button>
 </header>
 
-<!-- タグパネル（右上スライド表示） -->
+<!-- タグパネル -->
 <div id="tagPanel" class="hidden">
     <h3>タグ一覧</h3>
     <div id="tagList"></div>
@@ -59,11 +61,16 @@
     </div>
 </div>
 
+<!-- Supabase 初期化 -->
+<script>
+    const SUPABASE_URL = "https://cyntsmqckakzklrcnrcw.supabase.co";
+    const SUPABASE_ANON_KEY = "（あなたの anon key ）";
 
+    window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 
+<!-- あなたのコード -->
 <script src="script.js"></script>
+
 </body>
 </html>
-
-
-
