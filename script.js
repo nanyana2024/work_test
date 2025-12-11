@@ -79,22 +79,38 @@ function renderGallery() {
 
     gallery.innerHTML = result.map((v, i) => `
         <div class="card">
-            <iframe src="${convertToEmbedUrl(v.url)}"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-            </iframe>
-
+            ${buildEmbedHTML(v.url)}
             <h3>${v.title}</h3>
             <p>${v.description}</p>
             <div class="tags">
                 ${v.tags.map(t => `<span class="tag">${t}</span>`).join("")}
             </div>
-
             <button class="editBtn" onclick="openEditModal(${i})">編集</button>
             <button class="deleteBtn" onclick="deleteVideo(${i})">削除</button>
         </div>
     `).join("");
+
+    // ========= ここから追加 =========
+
+    // TikTok 再実行
+    const oldTikTok = document.querySelector('script[src="https://www.tiktok.com/embed.js"]');
+    if (oldTikTok) oldTikTok.remove();
+    const tikTokScript = document.createElement("script");
+    tikTokScript.src = "https://www.tiktok.com/embed.js";
+    tikTokScript.async = true;
+    document.body.appendChild(tikTokScript);
+
+    // X（Twitter）再実行
+    const oldTw = document.querySelector('script[src="https://platform.twitter.com/widgets.js"]');
+    if (oldTw) oldTw.remove();
+    const twScript = document.createElement("script");
+    twScript.src = "https://platform.twitter.com/widgets.js";
+    twScript.async = true;
+    document.body.appendChild(twScript);
+
+    // ========= 追加ここまで =========
 }
+
 
 
 // ---------------------------
