@@ -1,9 +1,6 @@
-// ---------------------------
-// Supabase 初期化
-// ---------------------------
-const supabaseUrl = "https://cyntsmqckakzklrcnrcw.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5bnRzbXFja2FremtscmNucmN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzOTQzMzEsImV4cCI6MjA4MDk3MDMzMX0.yL2pmAFgaYA5OPcI7tD9F_JUm8JiOVcOp0GdQ1eb-Z4";
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+// Supabase を window から取得
+const supabase = window.supabaseClient;
+
 
 
 // ---------------------------
