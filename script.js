@@ -1,13 +1,21 @@
+// ---------------------------
 // Supabase 初期化
-const supabaseUrl = "https://cyntsmqckakzklrcnrcw.supabase.co";   // あなたの URL
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5bnRzbXFja2FremtscmNucmN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzOTQzMzEsImV4cCI6MjA4MDk3MDMzMX0.yL2pmAFgaYA5OPcI7tD9F_JUm8JiOVcOp0GdQ1eb-Z4";               // anon key
+// ---------------------------
+const supabaseUrl = "https://cyntsmqckakzklrcnrcw.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5bnRzbXFja2FremtscmNucmN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzOTQzMzEsImV4cCI6MjA4MDk3MDMzMX0.yL2pmAFgaYA5OPcI7tD9F_JUm8JiOVcOp0GdQ1eb-Z4";
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 
+// ---------------------------
+// 変数
+// ---------------------------
 let videos = [];
 let editIndex = null;
 
-// YouTube URL を iframe 用に変換
+
+// ---------------------------
+// YouTube URL を embed 用に変換
+// ---------------------------
 function convertToEmbedUrl(url) {
     if (url.includes("youtube.com/watch")) {
         return url.replace("watch?v=", "embed/");
@@ -18,7 +26,10 @@ function convertToEmbedUrl(url) {
     return url;
 }
 
+
+// ---------------------------
 // Supabase から読み込み
+// ---------------------------
 async function loadVideos() {
     const { data, error } = await supabase
         .from("videos")
@@ -35,10 +46,13 @@ async function loadVideos() {
     buildTagPanel();
 }
 
-// ページ読み込み時に走らせる
+// ページ読み込み時に起動
 loadVideos();
 
 
+// ---------------------------
+// ギャラリー描画
+// ---------------------------
 function renderGallery() {
     const gallery = document.getElementById("gallery");
     const search = document.getElementById("searchInput").value.toLowerCase();
@@ -61,7 +75,10 @@ function renderGallery() {
 
     gallery.innerHTML = result.map((v, i) => `
         <div class="card">
-            <iframe src="${convertToEmbedUrl(v.url)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <iframe src="${convertToEmbedUrl(v.url)}"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
 
             <h3>${v.title}</h3>
             <p>${v.description}</p>
@@ -75,7 +92,10 @@ function renderGallery() {
     `).join("");
 }
 
-// タグ一覧パネル
+
+// ---------------------------
+// タグパネル
+// ---------------------------
 function buildTagPanel() {
     const tagList = document.getElementById("tagList");
     const tags = new Set();
@@ -92,8 +112,10 @@ function filterByTag(tag) {
     renderGallery();
 }
 
-// ===== Modal Control =====
 
+// ---------------------------
+// モーダル操作
+// ---------------------------
 const modal = document.getElementById("modal");
 const openAddBtn = document.getElementById("openAddModal");
 const closeBtn = document.getElementById("closeModal");
@@ -109,6 +131,7 @@ function hideModal() {
     modal.setAttribute("aria-hidden", "true");
 }
 
+
 // 追加モード
 function openAddModal() {
     editIndex = null;
@@ -120,6 +143,7 @@ function openAddModal() {
     showModal();
 }
 
+
 // 編集モード
 function openEditModal(i) {
     editIndex = i;
@@ -130,9 +154,9 @@ function openEditModal(i) {
     document.getElementById("modalTitleInput").value = v.title;
     document.getElementById("modalDesc").value = v.description;
     document.getElementById("modalTags").value = v.tags.join(",");
-
     showModal();
 }
+
 
 // イベント登録
 openAddBtn.onclick = openAddModal;
@@ -142,7 +166,10 @@ if (closeXBtn) closeXBtn.onclick = hideModal;
 // 背景クリックで閉じる
 modal.querySelector(".modal-overlay").onclick = hideModal;
 
-// 保存（Supabase へ INSERT / UPDATE）
+
+// ---------------------------
+// 保存（INSERT / UPDATE）
+// ---------------------------
 document.getElementById("saveModal").onclick = async () => {
     const url = document.getElementById("modalUrl").value;
     const title = document.getElementById("modalTitleInput").value;
@@ -152,15 +179,10 @@ document.getElementById("saveModal").onclick = async () => {
         .map(t => t.trim())
         .filter(t => t.length > 0);
 
-    const newData = {
-        url,
-        title,
-        description: desc,
-        tags
-    };
+    const newData = { url, title, description: desc, tags };
 
     if (editIndex === null) {
-        // 新規追加
+        // 新規
         const { error } = await supabase.from("videos").insert([newData]);
         if (error) {
             console.error("Insert error:", error);
@@ -180,11 +202,13 @@ document.getElementById("saveModal").onclick = async () => {
     }
 
     hideModal();
-    loadVideos(); // DB 最新状態を反映
+    loadVideos(); // DB から再読み込み
 };
 
-// 削除ボタン
 
+// ---------------------------
+// 削除処理
+// ---------------------------
 async function deleteVideo(index) {
     const ok = confirm("この動画を削除しますか？");
     if (!ok) return;
@@ -201,4 +225,3 @@ async function deleteVideo(index) {
 
     loadVideos(); // 更新後の一覧を再取得
 }
-
