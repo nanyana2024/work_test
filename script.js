@@ -1,7 +1,7 @@
+// ---------------------------
 // Supabase を window から取得
+// ---------------------------
 const supabase = window.supabaseClient;
-
-
 
 // ---------------------------
 // 変数
@@ -9,20 +9,9 @@ const supabase = window.supabaseClient;
 let videos = [];
 let editIndex = null;
 
-
 // ---------------------------
-// YouTube URL を embed 用に変換
+// URL サービス判定 & YouTube embed 変換
 // ---------------------------
-function convertToEmbedUrl(url) {
-    if (url.includes("youtube.com/watch")) {
-        return url.replace("watch?v=", "embed/");
-    }
-    if (url.includes("youtu.be/")) {
-        return url.replace("youtu.be/", "youtube.com/embed/");
-    }
-    return url;
-}
-
 function detectService(url) {
     if (url.includes("youtube.com") || url.includes("youtu.be")) return "youtube";
     if (url.includes("tiktok.com")) return "tiktok";
@@ -30,6 +19,11 @@ function detectService(url) {
     return "other";
 }
 
+function convertToEmbedUrl(url) {
+    if (url.includes("youtube.com/watch")) return url.replace("watch?v=", "embed/");
+    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/");
+    return url;
+}
 
 // ---------------------------
 // Supabase から読み込み
@@ -52,7 +46,6 @@ async function loadVideos() {
 
 // ページ読み込み時に起動
 loadVideos();
-
 
 // ---------------------------
 // ギャラリー描画
@@ -77,6 +70,7 @@ function renderGallery() {
     if (sortType === "title") result.sort((a, b) => a.title.localeCompare(b.title));
     if (sortType === "tag") result.sort((a, b) => (a.tags[0] || "").localeCompare(b.tags[0] || ""));
 
+    // ギャラリー描画
     gallery.innerHTML = result.map((v, i) => `
         <div class="card">
             ${buildEmbedHTML(v.url)}
@@ -90,28 +84,57 @@ function renderGallery() {
         </div>
     `).join("");
 
-    // ========= ここから追加 =========
-
-    // TikTok 再実行
-    const oldTikTok = document.querySelector('script[src="https://www.tiktok.com/embed.js"]');
-    if (oldTikTok) oldTikTok.remove();
-    const tikTokScript = document.createElement("script");
-    tikTokScript.src = "https://www.tiktok.com/embed.js";
-    tikTokScript.async = true;
-    document.body.appendChild(tikTokScript);
-
-    // X（Twitter）再実行
-    const oldTw = document.querySelector('script[src="https://platform.twitter.com/widgets.js"]');
-    if (oldTw) oldTw.remove();
-    const twScript = document.createElement("script");
-    twScript.src = "https://platform.twitter.com/widgets.js";
-    twScript.async = true;
-    document.body.appendChild(twScript);
-
-    // ========= 追加ここまで =========
+    // 埋め込みスクリプトの再読み込み
+    reloadTikTokScripts();
+    reloadTwitterScripts();
 }
 
+// ---------------------------
+// 埋め込み HTML 生成
+// ---------------------------
+function buildEmbedHTML(url) {
+    const service = detectService(url);
 
+    if (service === "youtube") {
+        return `<iframe src="${convertToEmbedUrl(url)}"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                </iframe>`;
+    }
+
+    if (service === "tiktok") {
+        return `<blockquote class="tiktok-embed" cite="${url}" style="max-width: 305px;min-width: 325px;">
+                    <section>Loading...</section>
+                </blockquote>`;
+    }
+
+    if (service === "x") {
+        return `<blockquote class="twitter-tweet"><a href="${url}"></a></blockquote>`;
+    }
+
+    return `<p>このURLは埋め込みに対応していません</p>`;
+}
+
+// ---------------------------
+// TikTok/X script 再読み込み
+// ---------------------------
+function reloadTikTokScripts() {
+    const old = document.querySelectorAll('script[src="https://www.tiktok.com/embed.js"]');
+    old.forEach(s => s.remove());
+    const script = document.createElement("script");
+    script.src = "https://www.tiktok.com/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+}
+
+function reloadTwitterScripts() {
+    const old = document.querySelectorAll('script[src="https://platform.twitter.com/widgets.js"]');
+    old.forEach(s => s.remove());
+    const script = document.createElement("script");
+    script.src = "https://platform.twitter.com/widgets.js";
+    script.async = true;
+    document.body.appendChild(script);
+}
 
 // ---------------------------
 // タグパネル
@@ -119,19 +142,14 @@ function renderGallery() {
 function buildTagPanel() {
     const tagList = document.getElementById("tagList");
     const tags = new Set();
-
     videos.forEach(v => v.tags.forEach(t => tags.add(t)));
-
-    tagList.innerHTML = [...tags].map(t => `
-        <button onclick="filterByTag('${t}')">${t}</button>
-    `).join("");
+    tagList.innerHTML = [...tags].map(t => `<button onclick="filterByTag('${t}')">${t}</button>`).join("");
 }
 
 function filterByTag(tag) {
     document.getElementById("searchInput").value = tag;
     renderGallery();
 }
-
 
 // ---------------------------
 // モーダル操作
@@ -141,18 +159,9 @@ const openAddBtn = document.getElementById("openAddModal");
 const closeBtn = document.getElementById("closeModal");
 const closeXBtn = document.getElementById("modalCloseX");
 
-function showModal() {
-    modal.classList.remove("hidden");
-    modal.setAttribute("aria-hidden", "false");
-}
+function showModal() { modal.classList.remove("hidden"); modal.setAttribute("aria-hidden","false"); }
+function hideModal() { modal.classList.add("hidden"); modal.setAttribute("aria-hidden","true"); }
 
-function hideModal() {
-    modal.classList.add("hidden");
-    modal.setAttribute("aria-hidden", "true");
-}
-
-
-// 追加モード
 function openAddModal() {
     editIndex = null;
     document.getElementById("modalHeader").textContent = "動画を追加";
@@ -163,12 +172,9 @@ function openAddModal() {
     showModal();
 }
 
-
-// 編集モード
 function openEditModal(i) {
     editIndex = i;
     const v = videos[i];
-
     document.getElementById("modalHeader").textContent = "動画を編集";
     document.getElementById("modalUrl").value = v.url;
     document.getElementById("modalTitleInput").value = v.title;
@@ -177,15 +183,11 @@ function openEditModal(i) {
     showModal();
 }
 
-
 // イベント登録
 openAddBtn.onclick = openAddModal;
 closeBtn.onclick = hideModal;
 if (closeXBtn) closeXBtn.onclick = hideModal;
-
-// 背景クリックで閉じる
 modal.querySelector(".modal-overlay").onclick = hideModal;
-
 
 // ---------------------------
 // 保存（INSERT / UPDATE）
@@ -194,54 +196,27 @@ document.getElementById("saveModal").onclick = async () => {
     const url = document.getElementById("modalUrl").value;
     const title = document.getElementById("modalTitleInput").value;
     const desc = document.getElementById("modalDesc").value;
-    const tags = document.getElementById("modalTags").value
-        .split(",")
-        .map(t => t.trim())
-        .filter(t => t.length > 0);
-
+    const tags = document.getElementById("modalTags").value.split(",").map(t=>t.trim()).filter(t=>t.length>0);
     const newData = { url, title, description: desc, tags };
 
     if (editIndex === null) {
-        // 新規
         const { error } = await supabase.from("videos").insert([newData]);
-        if (error) {
-            console.error("Insert error:", error);
-            return;
-        }
+        if (error) return console.error("Insert error:", error);
     } else {
-        // 編集
-        const { error } = await supabase
-            .from("videos")
-            .update(newData)
-            .eq("id", videos[editIndex].id);
-
-        if (error) {
-            console.error("Update error:", error);
-            return;
-        }
+        const { error } = await supabase.from("videos").update(newData).eq("id", videos[editIndex].id);
+        if (error) return console.error("Update error:", error);
     }
 
     hideModal();
-    loadVideos(); // DB から再読み込み
+    loadVideos();
 };
-
 
 // ---------------------------
 // 削除処理
 // ---------------------------
 async function deleteVideo(index) {
-    const ok = confirm("この動画を削除しますか？");
-    if (!ok) return;
-
-    const { error } = await supabase
-        .from("videos")
-        .delete()
-        .eq("id", videos[index].id);
-
-    if (error) {
-        console.error("Delete error:", error);
-        return;
-    }
-
-    loadVideos(); // 更新後の一覧を再取得
+    if (!confirm("この動画を削除しますか？")) return;
+    const { error } = await supabase.from("videos").delete().eq("id", videos[index].id);
+    if (error) return console.error("Delete error:", error);
+    loadVideos();
 }
