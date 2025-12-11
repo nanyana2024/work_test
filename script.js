@@ -85,10 +85,18 @@ function renderGallery() {
     `).join("");
 
     // X（Twitter）埋め込みを初期化
+    // twttr が準備できていればロード、まだなら準備完了後にロード
     if (window.twttr && twttr.widgets) {
         twttr.widgets.load();
+    } else {
+        window.twttr = window.twttr || {};
+        window.twttr.ready = window.twttr.ready || function(f){ document.addEventListener("DOMContentLoaded", f); };
+        window.twttr.ready(() => {
+            if (twttr.widgets) twttr.widgets.load();
+        });
     }
 }
+
 
 // ---------------------------
 // 埋め込み HTML 生成
