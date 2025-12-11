@@ -87,6 +87,11 @@ function renderGallery() {
     // 埋め込みスクリプトの再読み込み
     reloadTikTokScripts();
     reloadTwitterScripts();
+
+    // renderGallery() の最後で
+    if (window.twttr && twttr.widgets) {
+        twttr.widgets.load();
+    }
 }
 
 // ---------------------------
@@ -108,8 +113,13 @@ function buildEmbedHTML(url) {
                 </blockquote>`;
     }
 
+    // X（Twitter）埋め込み
     if (service === "x") {
-        return `<blockquote class="twitter-tweet"><a href="${url}"></a></blockquote>`;
+        return `
+            <blockquote class="twitter-tweet">
+                <a href="${url}"></a>
+            </blockquote>
+        `;
     }
 
     return `<p>このURLは埋め込みに対応していません</p>`;
