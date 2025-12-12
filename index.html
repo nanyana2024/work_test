@@ -8,6 +8,12 @@
 
     <!-- Supabase ライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- X（Twitter）埋め込みライブラリ -->
+    <script async src="https://platform.twitter.com/widgets.js"></script>
+
+    <!-- TikTok 埋め込みライブラリ -->
+    <script async src="https://www.tiktok.com/embed.js"></script>
 </head>
 <body>
 
@@ -46,36 +52,23 @@
         <input type="text" id="modalUrl">
 
         <label>タイトル</label>
-        <input type="text" id="modalTitle">
+        <input type="text" id="modalTitleInput">
 
         <label>説明文</label>
-        <textarea id="modalDescription"></textarea>
+        <textarea id="modalDesc"></textarea>
 
         <label>タグ（カンマ区切り）</label>
         <input type="text" id="modalTags">
 
         <div class="modal-buttons">
-            <button id="saveVideoBtn">保存</button>
-            <button id="closeModalBtn">閉じる</button>
+            <button id="saveModal">保存</button>
+            <button id="closeModal">閉じる</button>
         </div>
     </div>
 </div>
 
-<!-- Supabase 初期化 -->
-<script>
-    const SUPABASE_URL = "https://cyntsmqckakzklrcnrcw.supabase.co";
-
-    const SUPABASE_ANON_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5bnRzbXFja2FremtscmNucmN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzOTQzMzEsImV4cCI6MjA4MDk3MDMzMX0.yL2pmAFgaYA5OPcI7tD9F_JUm8JiOVcOp0GdQ1eb-Z4";
-
-    window.supabaseClient = supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-    );
-</script>
-
-<!-- Script -->
-<script src="script.js"></script>
+<!-- モジュールロード（重要） -->
+<script type="module" src="./js/main.js"></script>
 
 </body>
 </html>
