@@ -1,6 +1,8 @@
+// ui.js
 // ============================
 // UI（モーダル / イベント登録 / タグパネル）管理
 // ============================
+
 
 // ---------------------------
 // タグパネル
@@ -12,18 +14,26 @@ export function buildTagPanel(videos) {
     videos.forEach(v => v.tags.forEach(t => tags.add(t)));
 
     tagList.innerHTML = [...tags].map(t => `
-        <button onclick="filterByTag('${t}')">${t}</button>
+        <button class="tag-btn" data-tag="${t}">${t}</button>
     `).join("");
+
+    // デリゲーションでクリックイベントを管理
+    tagList.onclick = (e) => {
+        const tag = e.target.dataset.tag;
+        if (!tag) return;
+        filterByTag(tag);
+    };
 }
 
 export function filterByTag(tag) {
     document.getElementById("searchInput").value = tag;
 
-    // renderGallery は script.js 側で持つ
+    // renderGallery() は main.js が受けて処理
     document.dispatchEvent(
         new CustomEvent("requestRenderGallery")
     );
 }
+
 
 
 // ---------------------------
@@ -45,6 +55,7 @@ export function hideModal() {
 }
 
 
+
 // ---------------------------
 // 追加モード
 // ---------------------------
@@ -55,11 +66,12 @@ export function openAddModal() {
     document.getElementById("modalDesc").value = "";
     document.getElementById("modalTags").value = "";
 
-    // script.js 側で editIndex を管理するため通知
+    // main.js 側で editIndex を管理するため通知
     document.dispatchEvent(new Event("requestAddMode"));
 
     showModal();
 }
+
 
 
 // ---------------------------
@@ -72,13 +84,14 @@ export function openEditModal(video) {
     document.getElementById("modalDesc").value = video.description;
     document.getElementById("modalTags").value = video.tags.join(",");
 
-    // script.js に現在の video を渡す
+    // main.js に現在のデータを渡す
     document.dispatchEvent(
         new CustomEvent("requestEditMode", { detail: video })
     );
 
     showModal();
 }
+
 
 
 // ---------------------------
@@ -88,4 +101,28 @@ export function initUI() {
 
     // モーダル開閉
     openAddBtn.onclick = openAddModal;
-    close
+
+    closeBtn.onclick = hideModal;
+    closeXBtn.onclick = hideModal;
+
+    // モーダル外クリックで閉じる
+    window.addEventListener("click", (e) => {
+        if (e.target === modal) hideModal();
+    });
+
+    // 保存ボタン
+    document.getElementById("modalSave").onclick = () => {
+        document.dispatchEvent(new Event("requestSaveVideo"));
+    };
+
+    // 削除ボタン
+    document.getElementById("modalDelete").onclick = () => {
+        document.dispatchEvent(new Event("requestDeleteVideo"));
+    };
+
+    // 検索バー
+    const searchInput = document.getElementById("searchInput");
+    searchInput.oninput = () => {
+        document.dispatchEvent(new CustomEvent("requestRenderGallery"));
+    };
+}
