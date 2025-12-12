@@ -1,49 +1,62 @@
-import { loadVideos, saveVideo, deleteVideo, setEditIndex } from "./supabase.js";
+// main.js
+import { loadVideos, saveVideo, deleteVideoById, videos, editIndex } from "./supabase.js";
 import { initUI, openEditModal } from "./ui.js";
 import { renderGallery } from "./gallery.js";
 
-// アプリ全体の動画リスト
-let videos = [];
-
-// ------------------------------------
+// ==============================
 // 初期化
-// ------------------------------------
+// ==============================
 async function init() {
     initUI();
 
-    // Supabase からロード
-    videos = await loadVideos();
-
-    // タグパネルとギャラリー描画
-    renderGallery(videos);
+    await loadVideos(() => {
+        renderGallery();
+        document.dispatchEvent(new CustomEvent("buildTagPanelRequest"));
+    });
 
     console.log("Initialized");
 }
 
 init();
 
-// ------------------------------------
-// UI からのイベント受信
-// ------------------------------------
 
-// ギャラリー再描画要求
+// ==============================
+// リスナー
+// ==============================
+
+// ギャラリー再描画要求（検索・ソート・タグクリック）
 document.addEventListener("requestRenderGallery", () => {
-    renderGallery(videos);
+    renderGallery();
 });
+
+
+// タグパネル再構築要求（loadVideos の後）
+document.addEventListener("buildTagPanelRequest", () => {
+    document.dispatchEvent(new CustomEvent("buildTagsExternally"));
+});
+
 
 // 追加モード要求
 document.addEventListener("requestAddMode", () => {
-    setEditIndex(null);
+    // editIndex は supabase.js で管理
+    window.editIndex = null;
 });
 
-// 編集モード要求
+
+// 編集モード要求（ui.js → modal input 設定済）
 document.addEventListener("requestEditMode", (e) => {
-    setEditIndex(e.detail.id);
+    // supabase.js 管理の editIndex に設定したいが、
+    // id 直接指定のほうが安全
+    window.editIndex = e.detail.id;
 });
 
-// 保存要求
+
+// =======================================
+// 保存要求（ui.js → requestSave）
+// =======================================
 document.addEventListener("requestSave", async () => {
-    const url  = document.getElementById("modalUrl").value;
+
+    const url = document.getElementById("modalUrl").value;
     const title = document.getElementById("modalTitleInput").value;
     const desc = document.getElementById("modalDesc").value;
     const tags = document.getElementById("modalTags").value
@@ -51,20 +64,49 @@ document.addEventListener("requestSave", async () => {
         .map(t => t.trim())
         .filter(t => t.length > 0);
 
-    await saveVideo({ url, title, description: desc, tags });
+    // Supabase SAVE
+    await saveVideo({
+        url,
+        title,
+        description: desc,
+        tags
+    });
 
-    videos = await loadVideos();
-    renderGallery(videos);
+    // 再読み込み
+    await loadVideos(() => {
+        renderGallery();
+        document.dispatchEvent(new CustomEvent("buildTagPanelRequest"));
+    });
 });
 
-// 削除要求（gallery.js から呼ぶ）
-export async function handleDelete(id) {
-    await deleteVideo(id);
-    videos = await loadVideos();
-    renderGallery(videos);
-}
 
-// 編集要求（gallery.js から呼ぶ）
-export function handleEdit(index) {
-    openEditModal(videos[index]);
-}
+// =======================================
+// gallery.js → 編集ボタン
+// =======================================
+document.addEventListener("requestEditById", (e) => {
+    const id = e.detail;
+
+    const v = videos.find(v => v.id == id);
+    if (!v) return;
+
+    openEditModal(v);
+});
+
+
+// =======================================
+// gallery.js → 削除ボタン
+// =======================================
+document.addEventListener("requestDeleteById", async (e) => {
+    const id = e.detail;
+
+    const ok = confirm("この動画を削除しますか？");
+    if (!ok) return;
+
+    await deleteVideoById(id);
+
+    await loadVideos(() => {
+        renderGallery();
+        document.dispatchEvent(new CustomEvent("buildTagPanelRequest"));
+    });
+});
+
