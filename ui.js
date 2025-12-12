@@ -91,18 +91,21 @@ export function openEditModal(video) {
 export function initUI() {
 
     // モーダル開閉
-    if (openAddBtn) openAddBtn.onclick = openAddModal;
-    if (closeBtn)   closeBtn.onclick = hideModal;
-    if (closeXBtn)  closeXBtn.onclick = hideModal;
-    if (overlay)    overlay.onclick = hideModal;
+    openAddBtn.onclick = openAddModal;
+    closeBtn.onclick = hideModal;
+    closeXBtn.onclick = hideModal;
 
-    // 保存ボタン → main.jsへイベント
-    const saveBtn = document.getElementById("saveModal");
-    if (saveBtn) {
-        saveBtn.onclick = () => {
-            document.dispatchEvent(new Event("requestSave"));
-        };
-    }
+    // 保存
+    document.getElementById("saveModal").onclick = () => {
+        document.dispatchEvent(new Event("requestSave"));
+        hideModal();
+    };
 
-    console.log("UI Initialized");
+    // タグパネル
+    document.getElementById("tagPanelBtn").onclick = () => {
+        document.getElementById("tagPanel").classList.remove("hidden");
+    };
+    document.getElementById("closeTagPanel").onclick = () => {
+        document.getElementById("tagPanel").classList.add("hidden");
+    };
 }
