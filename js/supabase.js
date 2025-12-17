@@ -53,14 +53,10 @@ export async function updateVideo(id, updateData) {
 // ----------------------------------
 // 動画削除
 // ----------------------------------
-export async function deleteVideo(id) {
-    const { error } = await supabase
+// DELETE（ID指定）
+export async function deleteVideoById(id) {
+    return await supabase
         .from("videos")
         .delete()
         .eq("id", id);
-
-    if (error) {
-        console.error("Delete error:", error);
-        throw error;
-    }
 }
