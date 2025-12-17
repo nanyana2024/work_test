@@ -1,5 +1,4 @@
 // gallery.js
-import { videos } from "./supabase.js";
 import { buildEmbedHTML } from "./embed.js";
 
 // ============================
