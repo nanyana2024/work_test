@@ -4,7 +4,7 @@ import { buildEmbedHTML } from "./embed.js";
 // ============================
 // ギャラリー描画
 // ============================
-export function renderGallery() {
+export function renderGallery(videos) {
     const gallery = document.getElementById("gallery");
     const search = document.getElementById("searchInput").value.toLowerCase();
     const sortType = document.getElementById("sortSelect").value;
