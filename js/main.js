@@ -1,3 +1,5 @@
+console.log("main.js loaded");
+
 // main.js
 import { loadVideos, saveVideo, deleteVideoById, videos, editIndex } from "./supabase.js";
 import { initUI, openEditModal } from "./ui.js";
