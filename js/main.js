@@ -12,7 +12,7 @@ async function init() {
     initUI();
 
     await loadVideos(() => {
-        renderGallery();
+        renderGallery(videos);
         document.dispatchEvent(new CustomEvent("buildTagPanelRequest"));
     });
 
@@ -28,7 +28,7 @@ init();
 
 // ギャラリー再描画要求（検索・ソート・タグクリック）
 document.addEventListener("requestRenderGallery", () => {
-    renderGallery();
+    renderGallery(videos);
 });
 
 
@@ -76,7 +76,7 @@ document.addEventListener("requestSave", async () => {
 
     // 再読み込み
     await loadVideos(() => {
-        renderGallery();
+        renderGallery(videos);
         document.dispatchEvent(new CustomEvent("buildTagPanelRequest"));
     });
 });
@@ -107,7 +107,7 @@ document.addEventListener("requestDeleteById", async (e) => {
     await deleteVideoById(id);
 
     await loadVideos(() => {
-        renderGallery();
+        renderGallery(videos);
         document.dispatchEvent(new CustomEvent("buildTagPanelRequest"));
     });
 });
